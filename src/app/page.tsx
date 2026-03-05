@@ -5,6 +5,7 @@ import { IncidentType, ThreatType, AbuseReport } from '@/types/abuse-report';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMsal } from '@azure/msal-react';
+import { InteractionRequiredAuthError } from '@azure/msal-browser';
 import { loginRequest } from '@/lib/authConfig';
 
 const INCIDENT_TYPES: IncidentType[] = [
@@ -233,6 +234,26 @@ export default function Home() {
     const total = lines.length;
     let completed = 0;
 
+    // Acquire access token for MSRC API authorization
+    let accessToken: string;
+    try {
+      const tokenResponse = await instance.acquireTokenSilent({
+        ...loginRequest,
+        account: accounts[0],
+      });
+      accessToken = tokenResponse.accessToken;
+    } catch (tokenError) {
+      if (tokenError instanceof InteractionRequiredAuthError) {
+        const tokenResponse = await instance.acquireTokenPopup(loginRequest);
+        accessToken = tokenResponse.accessToken;
+      } else {
+        setNotification({type: 'error', message: 'Failed to acquire authentication token'});
+        setTimeout(() => setNotification(null), 5000);
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     for (const item of lines) {
       const now = new Date();
       // Format date as YYYY-MM-DD
@@ -276,6 +297,7 @@ export default function Home() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
           },
           body: JSON.stringify(report),
         });

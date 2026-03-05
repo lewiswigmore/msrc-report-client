@@ -143,8 +143,8 @@ export async function GET(req: NextRequest) {
     // Apply pagination (handle both OData-style and simple params)
     const skipOdata = searchParams.get('$skip');
     const topOdata = searchParams.get('$top');
-    const skip = parseInt(searchParams.get('skip') || skipOdata || '0', 10);
-    const top = parseInt(searchParams.get('top') || topOdata || '50', 10);
+    const skip = Math.max(0, parseInt(searchParams.get('skip') || skipOdata || '0', 10)) || 0;
+    const top = Math.min(200, Math.max(1, parseInt(searchParams.get('top') || topOdata || '50', 10) || 50));
     
     updates = updates.slice(skip, skip + top);
     

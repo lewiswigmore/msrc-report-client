@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { validateTokenClaims } from '@/lib/verifyToken';
 
 const MSRC_ENDPOINT = 'https://api.msrc.microsoft.com/report/v2.0/abuse';
 
@@ -31,15 +32,16 @@ function validateReportBody(body: unknown): { valid: boolean; error?: string } {
     return { valid: false, error: 'Invalid or missing threatType' };
   }
 
-  if (!report.reporterEmail || typeof report.reporterEmail !== 'string' || !report.reporterEmail.includes('@')) {
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!report.reporterEmail || typeof report.reporterEmail !== 'string' || !emailRegex.test(report.reporterEmail) || report.reporterEmail.length > 254) {
     return { valid: false, error: 'Invalid or missing reporterEmail' };
   }
 
-  if (!report.reporterName || typeof report.reporterName !== 'string' || report.reporterName.length < 1) {
+  if (!report.reporterName || typeof report.reporterName !== 'string' || report.reporterName.length < 1 || report.reporterName.length > 200) {
     return { valid: false, error: 'Invalid or missing reporterName' };
   }
 
-  if (!report.reportNotes || typeof report.reportNotes !== 'string') {
+  if (!report.reportNotes || typeof report.reportNotes !== 'string' || report.reportNotes.length > 10000) {
     return { valid: false, error: 'Invalid or missing reportNotes' };
   }
 
@@ -59,17 +61,42 @@ function validateReportBody(body: unknown): { valid: boolean; error?: string } {
 // Validate Authorization header format
 function validateAuthHeader(authHeader: string | null): boolean {
   if (!authHeader) return false;
-  // Should be "Bearer <token>" format
   return authHeader.startsWith('Bearer ') && authHeader.length > 10;
+}
+
+// CSRF defense-in-depth: reject cross-origin POST requests
+function validateOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get('origin');
+  if (!origin) return true; // Same-origin or non-browser requests omit Origin
+  const requestOrigin = new URL(request.url).origin;
+  return origin === requestOrigin;
 }
 
 export async function POST(req: NextRequest) {
   try {
+    // CSRF: reject cross-origin requests
+    if (!validateOrigin(req)) {
+      return NextResponse.json(
+        { error: 'Forbidden', message: 'Cross-origin requests not allowed' },
+        { status: 403 }
+      );
+    }
+
     // Validate Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!validateAuthHeader(authHeader)) {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Valid authorization token required' },
+        { status: 401 }
+      );
+    }
+
+    // Validate JWT claims (expiry, issuer) as defense-in-depth
+    const token = authHeader!.slice(7);
+    const tokenValidation = validateTokenClaims(token);
+    if (!tokenValidation.valid) {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: tokenValidation.error },
         { status: 401 }
       );
     }
