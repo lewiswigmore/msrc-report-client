@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import Link from 'next/link';
 
 // Helper to safely extract string value from various API formats
@@ -12,6 +13,17 @@ const extractValue = (val: unknown): string => {
   }
   return String(val);
 };
+
+// Sanitize HTML from API responses to prevent XSS
+const sanitizeHtml = (html: string): string => {
+  if (typeof window === 'undefined') return html;
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'code', 'pre'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+    ALLOW_DATA_ATTR: false,
+  });
+};
+
 
 interface CVRFDocument {
   DocumentTitle?: { Value: string } | string;
@@ -346,7 +358,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
                           )}
                           <div 
                             className="text-gray-700 prose prose-sm max-w-none leading-relaxed"
-                            dangerouslySetInnerHTML={{ __html: extractValue(note.Value) }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(extractValue(note.Value)) }}
                           />
                         </div>
                       ))}
@@ -383,7 +395,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
                               <td className="px-6 py-4 text-sm text-gray-600">{formatDate(rev.Date)}</td>
                               <td 
                                 className="px-6 py-4 text-sm text-gray-700"
-                                dangerouslySetInnerHTML={{ __html: extractValue(rev.Description) || '-' }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeHtml(extractValue(rev.Description) || '-') }}
                               />
                             </tr>
                           ))}
@@ -473,7 +485,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
                               </span>
                               <div 
                                 className="text-gray-700 leading-relaxed prose prose-sm max-w-none"
-                                dangerouslySetInnerHTML={{ __html: extractValue(note.Value) }} 
+                                dangerouslySetInnerHTML={{ __html: sanitizeHtml(extractValue(note.Value)) }} 
                               />
                             </div>
                           ))}

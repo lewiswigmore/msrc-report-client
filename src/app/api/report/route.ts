@@ -31,15 +31,16 @@ function validateReportBody(body: unknown): { valid: boolean; error?: string } {
     return { valid: false, error: 'Invalid or missing threatType' };
   }
 
-  if (!report.reporterEmail || typeof report.reporterEmail !== 'string' || !report.reporterEmail.includes('@')) {
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!report.reporterEmail || typeof report.reporterEmail !== 'string' || !emailRegex.test(report.reporterEmail) || report.reporterEmail.length > 254) {
     return { valid: false, error: 'Invalid or missing reporterEmail' };
   }
 
-  if (!report.reporterName || typeof report.reporterName !== 'string' || report.reporterName.length < 1) {
+  if (!report.reporterName || typeof report.reporterName !== 'string' || report.reporterName.length < 1 || report.reporterName.length > 200) {
     return { valid: false, error: 'Invalid or missing reporterName' };
   }
 
-  if (!report.reportNotes || typeof report.reportNotes !== 'string') {
+  if (!report.reportNotes || typeof report.reportNotes !== 'string' || report.reportNotes.length > 10000) {
     return { valid: false, error: 'Invalid or missing reportNotes' };
   }
 
