@@ -14,8 +14,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@azure/msal-browser": "^5.2.0",
-    "@azure/msal-react": "^5.0.4",
+    "@azure/msal-browser": "^5.4.0",
+    "@azure/msal-react": "^5.0.6",
     "dompurify": "^3.3.2",
     "jose": "^6.2.0",
     "next": "16.1.6",
