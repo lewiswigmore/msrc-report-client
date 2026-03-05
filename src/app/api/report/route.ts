@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { validateTokenClaims } from '@/lib/verifyToken';
 
 const MSRC_ENDPOINT = 'https://api.msrc.microsoft.com/report/v2.0/abuse';
 
@@ -60,17 +61,42 @@ function validateReportBody(body: unknown): { valid: boolean; error?: string } {
 // Validate Authorization header format
 function validateAuthHeader(authHeader: string | null): boolean {
   if (!authHeader) return false;
-  // Should be "Bearer <token>" format
   return authHeader.startsWith('Bearer ') && authHeader.length > 10;
+}
+
+// CSRF defense-in-depth: reject cross-origin POST requests
+function validateOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get('origin');
+  if (!origin) return true; // Same-origin or non-browser requests omit Origin
+  const requestOrigin = new URL(request.url).origin;
+  return origin === requestOrigin;
 }
 
 export async function POST(req: NextRequest) {
   try {
+    // CSRF: reject cross-origin requests
+    if (!validateOrigin(req)) {
+      return NextResponse.json(
+        { error: 'Forbidden', message: 'Cross-origin requests not allowed' },
+        { status: 403 }
+      );
+    }
+
     // Validate Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!validateAuthHeader(authHeader)) {
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Valid authorization token required' },
+        { status: 401 }
+      );
+    }
+
+    // Validate JWT claims (expiry, issuer) as defense-in-depth
+    const token = authHeader!.slice(7);
+    const tokenValidation = validateTokenClaims(token);
+    if (!tokenValidation.valid) {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: tokenValidation.error },
         { status: 401 }
       );
     }
