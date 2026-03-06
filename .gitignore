@@ -43,6 +43,7 @@ yarn-error.log*
 next-env.d.ts
 
 # Editor and IDE
+.copilot/
 .idea/
 .vscode/
 *.swp

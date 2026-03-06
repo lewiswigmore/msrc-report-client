@@ -17,17 +17,17 @@ export default function Error({
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-[var(--ms-header-bg)] text-white h-[48px] flex items-center px-6">
-        <div className="flex items-center gap-3">
-          <svg viewBox="0 0 23 23" className="w-[23px] h-[23px]" aria-label="Microsoft Logo">
+      <header className="bg-[var(--ms-header-bg)] text-white h-[48px] flex items-center px-4 sm:px-6">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <svg viewBox="0 0 23 23" className="w-[20px] h-[20px] sm:w-[23px] sm:h-[23px]" aria-label="Microsoft Logo">
             <rect x="0" y="0" width="10" height="10" fill="#f25022"></rect>
             <rect x="12" y="0" width="10" height="10" fill="#7fba00"></rect>
             <rect x="0" y="12" width="10" height="10" fill="#00a4ef"></rect>
             <rect x="12" y="12" width="10" height="10" fill="#ffb900"></rect>
           </svg>
-          <span className="font-semibold text-[15px]">Microsoft</span>
-          <div className="h-4 w-px bg-gray-600 mx-2"></div>
-          <span className="text-[15px]">Security Response Center</span>
+          <span className="font-semibold text-[14px] sm:text-[15px]">Microsoft</span>
+          <div className="h-4 w-px bg-gray-600 mx-1 sm:mx-2 hidden sm:block"></div>
+          <span className="text-[13px] sm:text-[15px] hidden sm:block">Security Response Center</span>
         </div>
       </header>
 
@@ -52,15 +52,15 @@ export default function Error({
       </nav>
 
       {/* Error Content */}
-      <main className="flex-1 flex items-center justify-center py-20">
+      <main className="flex-1 flex items-center justify-center py-12 sm:py-20">
         <div className="text-center max-w-lg px-4">
-          <div className="mb-8">
-            <svg className="w-20 h-20 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mb-6 sm:mb-8">
+            <svg className="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-semibold text-gray-900 mb-4">Something went wrong</h1>
-          <p className="text-gray-600 mb-8">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-4">Something went wrong</h1>
+          <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
             An unexpected error occurred. Please try again or contact support if the problem persists.
           </p>
           {error.digest && (
@@ -86,7 +86,7 @@ export default function Error({
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-6 px-4 border-t border-gray-200">
+      <footer className="bg-gray-100 py-4 sm:py-6 px-4 border-t border-gray-200">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <div className="flex flex-wrap justify-center gap-6">
             <a href="https://go.microsoft.com/fwlink/?LinkId=521839" className="hover:underline" target="_blank" rel="noopener noreferrer">Privacy</a>

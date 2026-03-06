@@ -1,9 +1,73 @@
 'use client';
 
-import { MsalProvider } from '@azure/msal-react';
-import { PublicClientApplication, EventType, AuthenticationResult, EventMessage, AuthError } from '@azure/msal-browser';
-import { msalConfig, isAuthConfigured, getAuthConfigInfo } from '@/lib/authConfig';
-import { ReactNode, useEffect, useState } from 'react';
+import { MsalProvider, useMsal } from '@azure/msal-react';
+import { PublicClientApplication, EventType, AuthenticationResult, EventMessage, AuthError, InteractionRequiredAuthError } from '@azure/msal-browser';
+import { msalConfig, loginRequest, isAuthConfigured, getAuthConfigInfo } from '@/lib/authConfig';
+import { ReactNode, createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
+
+// Auth context abstracts MSAL vs demo mode
+interface AuthContextType {
+  isDemo: boolean;
+  isAuthenticated: boolean;
+  userName: string;
+  userEmail: string;
+  acquireToken: () => Promise<string>;
+  signOut: () => void;
+  login: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  isDemo: false,
+  isAuthenticated: false,
+  userName: '',
+  userEmail: '',
+  acquireToken: async () => { throw new Error('AuthContext not initialized'); },
+  signOut: () => {},
+  login: async () => {},
+});
+
+export const useAuth = () => useContext(AuthContext);
+
+// Bridge reads MSAL state and provides it via AuthContext
+function MsalAuthBridge({ children }: { children: ReactNode }) {
+  const { instance, accounts } = useMsal();
+
+  const acquireToken = useCallback(async () => {
+    try {
+      const response = await instance.acquireTokenSilent({
+        ...loginRequest,
+        account: accounts[0],
+      });
+      return response.accessToken;
+    } catch (error) {
+      if (error instanceof InteractionRequiredAuthError) {
+        const response = await instance.acquireTokenPopup(loginRequest);
+        return response.accessToken;
+      }
+      throw error;
+    }
+  }, [instance, accounts]);
+
+  const signOut = useCallback(() => {
+    instance.logoutRedirect();
+  }, [instance]);
+
+  const login = useCallback(async () => {
+    await instance.loginRedirect(loginRequest);
+  }, [instance]);
+
+  const authValue = useMemo<AuthContextType>(() => ({
+    isDemo: false,
+    isAuthenticated: accounts.length > 0,
+    userName: accounts[0]?.name || '',
+    userEmail: accounts[0]?.username || '',
+    acquireToken,
+    signOut,
+    login,
+  }), [accounts, acquireToken, signOut, login]);
+
+  return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
+}
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -25,8 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Check if auth is properly configured
     if (!isAuthConfigured()) {
-      console.error('[AuthProvider] Azure AD not configured. Check environment variables.');
-      setInitError('Authentication not configured. Please set NEXT_PUBLIC_AZURE_CLIENT_ID and NEXT_PUBLIC_AZURE_TENANT_ID.');
+      console.warn('[AuthProvider] Azure AD not configured — running in demo mode.');
+      setInitError('__demo__');
       setIsInitialized(true);
       return;
     }
@@ -98,6 +162,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   }
 
+  // Demo mode: auth not configured
+  if (initError === '__demo__') {
+    const demoValue: AuthContextType = {
+      isDemo: true,
+      isAuthenticated: true,
+      userName: 'Demo User',
+      userEmail: 'demo@microsoft.com',
+      acquireToken: async () => 'demo-token',
+      signOut: () => window.location.reload(),
+      login: async () => {},
+    };
+    return (
+      <AuthContext.Provider value={demoValue}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
+
   // Show error state if initialization failed
   if (initError) {
     return (
@@ -119,5 +201,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  return <MsalProvider instance={msalInstance}>{children}</MsalProvider>;
+  return (
+    <MsalProvider instance={msalInstance}>
+      <MsalAuthBridge>{children}</MsalAuthBridge>
+    </MsalProvider>
+  );
 }

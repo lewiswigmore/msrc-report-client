@@ -85,14 +85,14 @@ interface CVRFDocument {
 
 // Stat card component for overview
 const StatCard = ({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-    <div className="flex items-center gap-4">
-      <div className="p-3 bg-blue-50 rounded-lg text-[var(--ms-blue)]">
+  <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+    <div className="flex items-center gap-3 sm:gap-4">
+      <div className="p-2 sm:p-3 bg-blue-50 rounded-lg text-[var(--ms-blue)]">
         {icon}
       </div>
       <div>
-        <p className="text-sm text-gray-500 font-medium">{label}</p>
-        <p className="text-2xl font-semibold text-gray-900">{value}</p>
+        <p className="text-xs sm:text-sm text-gray-500 font-medium">{label}</p>
+        <p className="text-xl sm:text-2xl font-semibold text-gray-900">{value}</p>
       </div>
     </div>
   </div>
@@ -175,17 +175,17 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-[var(--ms-header-bg)] text-white h-[48px] flex items-center px-6">
-        <div className="flex items-center gap-3">
-          <svg viewBox="0 0 23 23" className="w-[23px] h-[23px]" aria-label="Microsoft Logo">
+      <header className="bg-[var(--ms-header-bg)] text-white h-[48px] flex items-center px-4 sm:px-6">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <svg viewBox="0 0 23 23" className="w-[20px] h-[20px] sm:w-[23px] sm:h-[23px]" aria-label="Microsoft Logo">
             <rect x="0" y="0" width="10" height="10" fill="#f25022"></rect>
             <rect x="12" y="0" width="10" height="10" fill="#7fba00"></rect>
             <rect x="0" y="12" width="10" height="10" fill="#00a4ef"></rect>
             <rect x="12" y="12" width="10" height="10" fill="#ffb900"></rect>
           </svg>
-          <span className="font-semibold text-[15px]">Microsoft</span>
-          <div className="h-4 w-px bg-gray-600 mx-2"></div>
-          <span className="text-[15px]">Security Response Center</span>
+          <span className="font-semibold text-[14px] sm:text-[15px]">Microsoft</span>
+          <div className="h-4 w-px bg-gray-600 mx-1 sm:mx-2 hidden sm:block"></div>
+          <span className="text-[13px] sm:text-[15px] hidden sm:block">Security Response Center</span>
         </div>
       </header>
 
@@ -244,7 +244,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
         ) : document ? (
           <>
             {/* Document Header */}
-            <div className="bg-white p-8 shadow-sm border border-gray-200 rounded-lg mb-8">
+            <div className="bg-white p-5 sm:p-8 shadow-sm border border-gray-200 rounded-lg mb-6 sm:mb-8">
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
@@ -255,7 +255,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
                       v{document.DocumentTracking?.Version || '1.0'}
                     </span>
                   </div>
-                  <h1 className="text-3xl font-semibold text-gray-900 mb-4">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
                     {extractValue(document.DocumentTitle) || id}
                   </h1>
                   <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
@@ -279,7 +279,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
             </div>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
               <StatCard
                 label="Vulnerabilities"
                 value={document.Vulnerability?.length || 0}
@@ -310,13 +310,13 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200 mb-8">
-              <nav className="flex gap-1">
+            <div className="border-b border-gray-200 mb-6 sm:mb-8">
+              <nav className="flex gap-1 overflow-x-auto">
                 {(['overview', 'vulnerabilities', 'products'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors rounded-t-lg ${
+                    className={`px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors rounded-t-lg whitespace-nowrap ${
                       activeTab === tab
                         ? 'border-[var(--ms-blue)] text-[var(--ms-blue)] bg-blue-50'
                         : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -343,8 +343,8 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
               <div className="space-y-8">
                 {/* Document Notes */}
                 {document.DocumentNotes && document.DocumentNotes.length > 0 && (
-                  <div className="bg-white p-8 shadow-sm border border-gray-200 rounded-lg">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                  <div className="bg-white p-5 sm:p-8 shadow-sm border border-gray-200 rounded-lg">
+                    <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2">
                       <svg className="w-5 h-5 text-[var(--ms-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
@@ -352,12 +352,12 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
                     </h2>
                     <div className="space-y-6">
                       {document.DocumentNotes.map((note, idx) => (
-                        <div key={idx} className="border-l-4 border-[var(--ms-blue)] pl-6 py-2 bg-gray-50 rounded-r-lg">
+                        <div key={idx} className="border-l-4 border-[var(--ms-blue)] pl-4 sm:pl-6 py-2 bg-gray-50 rounded-r-lg overflow-hidden">
                           {note.Title && (
-                            <h3 className="font-semibold text-gray-900 mb-2 text-lg">{note.Title}</h3>
+                            <h3 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">{note.Title}</h3>
                           )}
                           <div 
-                            className="text-gray-700 prose prose-sm max-w-none leading-relaxed"
+                            className="text-gray-700 prose prose-sm max-w-none leading-relaxed overflow-x-auto"
                             dangerouslySetInnerHTML={{ __html: sanitizeHtml(extractValue(note.Value)) }}
                           />
                         </div>
@@ -368,8 +368,8 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
 
                 {/* Revision History */}
                 {document.DocumentTracking?.RevisionHistory && document.DocumentTracking.RevisionHistory.length > 0 && (
-                  <div className="bg-white p-8 shadow-sm border border-gray-200 rounded-lg">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                  <div className="bg-white p-5 sm:p-8 shadow-sm border border-gray-200 rounded-lg">
+                    <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2">
                       <svg className="w-5 h-5 text-[var(--ms-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -410,8 +410,8 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
             {activeTab === 'vulnerabilities' && (
               <div className="space-y-6">
                 {/* Search bar for vulnerabilities */}
-                <div className="bg-white p-6 shadow-sm border border-gray-200 rounded-lg">
-                  <div className="flex items-center gap-4">
+                <div className="bg-white p-4 sm:p-6 shadow-sm border border-gray-200 rounded-lg">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                     <div className="flex-1 relative">
                       <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -432,8 +432,8 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
 
                 {filteredVulnerabilities.length > 0 ? (
                   filteredVulnerabilities.map((vuln, idx) => (
-                    <div key={idx} className="bg-white p-8 shadow-sm border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-6">
+                    <div key={idx} className="bg-white p-5 sm:p-8 shadow-sm border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 sm:gap-6 mb-4 sm:mb-6">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-3">
                             {vuln.CVE ? (
@@ -457,7 +457,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
                           )}
                         </div>
                         {vuln.CVSSScoreSets && vuln.CVSSScoreSets[0] && (
-                          <div className="flex flex-col items-center justify-center bg-gray-50 rounded-xl p-4 min-w-[120px]">
+                          <div className="flex flex-col items-center justify-center bg-gray-50 rounded-xl p-4 min-w-[100px] sm:min-w-[120px]">
                             <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">CVSS Score</span>
                             <span className={`text-3xl font-bold mt-1 ${
                               vuln.CVSSScoreSets[0].BaseScore >= 9 ? 'text-red-600' :
@@ -467,7 +467,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
                               {vuln.CVSSScoreSets[0].BaseScore.toFixed(1)}
                             </span>
                             {vuln.CVSSScoreSets[0].Vector && (
-                              <span className="text-xs text-gray-400 mt-2 break-all max-w-[200px] text-center">
+                              <span className="text-xs text-gray-400 mt-2 break-all max-w-[160px] sm:max-w-[200px] text-center">
                                 {vuln.CVSSScoreSets[0].Vector}
                               </span>
                             )}
@@ -484,7 +484,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
                                 {note.Title || `Type ${note.Type}`}:
                               </span>
                               <div 
-                                className="text-gray-700 leading-relaxed prose prose-sm max-w-none"
+                                className="text-gray-700 leading-relaxed prose prose-sm max-w-none overflow-x-auto"
                                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(extractValue(note.Value)) }} 
                               />
                             </div>
@@ -557,15 +557,15 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
             )}
 
             {activeTab === 'products' && (
-              <div className="bg-white p-8 shadow-sm border border-gray-200 rounded-lg">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-                  <h2 className="text-xl font-semibold flex items-center gap-2">
+              <div className="bg-white p-5 sm:p-8 shadow-sm border border-gray-200 rounded-lg">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
                     <svg className="w-5 h-5 text-[var(--ms-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                     </svg>
                     Affected Products
                   </h2>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                     <div className="relative flex-1 lg:w-80">
                       <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -623,7 +623,7 @@ export default function CVRFDetailPage({ params }: { params: Promise<{ id: strin
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-6 px-4 mt-auto border-t border-gray-200">
+      <footer className="bg-gray-100 py-4 sm:py-6 px-4 mt-auto border-t border-gray-200">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <div className="flex flex-wrap justify-center gap-6">
             <a href="https://go.microsoft.com/fwlink/?LinkId=521839" className="hover:underline" target="_blank" rel="noopener noreferrer">Privacy</a>

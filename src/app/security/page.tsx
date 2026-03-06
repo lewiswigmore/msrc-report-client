@@ -2,6 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { AppHeader } from '@/components/AppHeader';
+import { HeroBanner } from '@/components/HeroBanner';
+import { Navigation } from '@/components/Navigation';
+import { AppFooter } from '@/components/AppFooter';
 
 interface SecurityUpdate {
   ID: string;
@@ -112,63 +116,27 @@ export default function SecurityUpdatesPage() {
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      {/* Header */}
-      <header className="bg-[var(--ms-header-bg)] text-white h-[48px] flex items-center px-6">
-        <div className="flex items-center gap-3">
-          <svg viewBox="0 0 23 23" className="w-[23px] h-[23px]" aria-label="Microsoft Logo">
-            <rect x="0" y="0" width="10" height="10" fill="#f25022"></rect>
-            <rect x="12" y="0" width="10" height="10" fill="#7fba00"></rect>
-            <rect x="0" y="12" width="10" height="10" fill="#00a4ef"></rect>
-            <rect x="12" y="12" width="10" height="10" fill="#ffb900"></rect>
-          </svg>
-          <span className="font-semibold text-[15px]">Microsoft</span>
-          <div className="h-4 w-px bg-gray-600 mx-2"></div>
-          <span className="text-[15px]">Security Response Center</span>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[var(--background)] flex flex-col">
+      <AppHeader subtitle="Security Response Center" />
 
-      {/* Navigation */}
-      <nav className="bg-[#f8f8f8] border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-1">
-            <Link
-              href="/"
-              className="px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300"
-            >
-              Report Abuse
-            </Link>
-            <Link
-              href="/security"
-              className="px-4 py-3 text-sm font-medium text-[var(--ms-blue)] border-b-2 border-[var(--ms-blue)]"
-            >
-              Security Updates
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
-      {/* Hero */}
-      <div className="bg-[var(--ms-blue)] text-white p-8 md:p-12">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-light mb-2">Security Updates</h1>
-          <p className="text-sm md:text-base opacity-90 max-w-2xl">
-            Browse Microsoft security bulletins and vulnerability information from the MSRC CVRF API.
-          </p>
-        </div>
-      </div>
+      <HeroBanner
+        title="Security Updates"
+        description="Browse Microsoft security bulletins and vulnerability information from the MSRC CVRF API."
+      />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8 flex-1">
         {/* Filters */}
-        <div className="bg-white p-6 shadow-sm border border-gray-200 rounded-lg mb-6">
+        <div className="bg-white p-4 sm:p-6 shadow-sm border border-gray-200 rounded-lg mb-6">
           <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
             Filter Updates
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {/* Search */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
@@ -218,8 +186,8 @@ export default function SecurityUpdatesPage() {
         </div>
 
         {/* CVE Lookup Card */}
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 p-6 rounded-lg mb-8">
-          <div className="flex flex-col md:flex-row md:items-center gap-6">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 p-4 sm:p-6 rounded-lg mb-6 sm:mb-8">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 sm:gap-6">
             <div className="flex-1">
               <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
                 <svg className="w-5 h-5 text-[var(--ms-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +250,41 @@ export default function SecurityUpdatesPage() {
               </div>
             </div>
 
-            <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+            {/* Mobile card view */}
+            <div className="block sm:hidden space-y-3">
+              {filteredUpdates.map((update) => (
+                <div key={update.ID} className="bg-white shadow-sm border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <Link
+                      href={`/security/cvrf/${update.ID}`}
+                      className="text-[var(--ms-blue)] hover:underline font-semibold text-sm"
+                    >
+                      {update.ID}
+                    </Link>
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(update.DocumentTitle)}`}>
+                      {getTypeLabel(update.DocumentTitle)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-900 mb-2">{update.DocumentTitle}</p>
+                  {update.Alias && (
+                    <p className="text-xs text-gray-500 mb-2">{update.Alias}</p>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{formatDate(update.InitialReleaseDate)}</span>
+                    <Link
+                      href={`/security/cvrf/${update.ID}`}
+                      className="text-[var(--ms-blue)] hover:underline font-medium"
+                    >
+                      View Details →
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table view */}
+            <div className="hidden sm:block bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+              <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
@@ -355,6 +357,7 @@ export default function SecurityUpdatesPage() {
                 </tbody>
               </table>
 
+              </div>
               {filteredUpdates.length === 0 && (
                 <div className="text-center py-16 px-4">
                   <svg className="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -378,17 +381,7 @@ export default function SecurityUpdatesPage() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-100 py-6 px-4 mt-auto border-t border-gray-200">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
-          <div className="flex flex-wrap justify-center gap-6">
-            <a href="https://go.microsoft.com/fwlink/?LinkId=521839" className="hover:underline" target="_blank" rel="noopener noreferrer">Privacy</a>
-            <a href="https://go.microsoft.com/fwlink/?LinkID=206977" className="hover:underline" target="_blank" rel="noopener noreferrer">Terms of Use</a>
-            <a href="https://www.microsoft.com/msrc" className="hover:underline" target="_blank" rel="noopener noreferrer">MSRC</a>
-          </div>
-          <div>© {new Date().getFullYear()} Microsoft</div>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   );
 }

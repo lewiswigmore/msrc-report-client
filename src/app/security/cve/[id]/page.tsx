@@ -80,17 +80,17 @@ export default function CVEDetailPage({ params }: { params: Promise<{ id: string
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-[var(--ms-header-bg)] text-white h-[48px] flex items-center px-6">
-        <div className="flex items-center gap-3">
-          <svg viewBox="0 0 23 23" className="w-[23px] h-[23px]" aria-label="Microsoft Logo">
+      <header className="bg-[var(--ms-header-bg)] text-white h-[48px] flex items-center px-4 sm:px-6">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <svg viewBox="0 0 23 23" className="w-[20px] h-[20px] sm:w-[23px] sm:h-[23px]" aria-label="Microsoft Logo">
             <rect x="0" y="0" width="10" height="10" fill="#f25022"></rect>
             <rect x="12" y="0" width="10" height="10" fill="#7fba00"></rect>
             <rect x="0" y="12" width="10" height="10" fill="#00a4ef"></rect>
             <rect x="12" y="12" width="10" height="10" fill="#ffb900"></rect>
           </svg>
-          <span className="font-semibold text-[15px]">Microsoft</span>
-          <div className="h-4 w-px bg-gray-600 mx-2"></div>
-          <span className="text-[15px]">Security Response Center</span>
+          <span className="font-semibold text-[14px] sm:text-[15px]">Microsoft</span>
+          <div className="h-4 w-px bg-gray-600 mx-1 sm:mx-2 hidden sm:block"></div>
+          <span className="text-[13px] sm:text-[15px] hidden sm:block">Security Response Center</span>
         </div>
       </header>
 
@@ -137,7 +137,7 @@ export default function CVEDetailPage({ params }: { params: Promise<{ id: string
             <span className="ml-3 text-gray-600">Searching for {id.toUpperCase()}...</span>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 p-8 rounded-sm text-center">
+          <div className="bg-red-50 border border-red-200 p-5 sm:p-8 rounded-sm text-center">
             <svg className="w-12 h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -145,7 +145,7 @@ export default function CVEDetailPage({ params }: { params: Promise<{ id: string
             <p className="text-red-600 text-sm mb-6">
               This CVE may not be related to Microsoft products, or updates have not been published yet.
             </p>
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-center gap-3 sm:gap-4">
               <Link
                 href="/security"
                 className="text-sm text-[var(--ms-blue)] hover:underline"
@@ -165,9 +165,9 @@ export default function CVEDetailPage({ params }: { params: Promise<{ id: string
         ) : data ? (
           <>
             {/* CVE Header */}
-            <div className="bg-white p-6 shadow-sm border border-gray-200 rounded-sm mb-6">
-              <div className="flex items-center gap-4 mb-4">
-                <h1 className="text-2xl font-semibold text-gray-900">{data.cve}</h1>
+            <div className="bg-white p-4 sm:p-6 shadow-sm border border-gray-200 rounded-sm mb-6">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4">
+                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">{data.cve}</h1>
                 <a
                   href={`https://cve.mitre.org/cgi-bin/cvename.cgi?name=${data.cve}`}
                   target="_blank"
@@ -202,7 +202,7 @@ export default function CVEDetailPage({ params }: { params: Promise<{ id: string
               {data.updates.map((update) => (
                 <div
                   key={update.ID}
-                  className="bg-white p-6 shadow-sm border border-gray-200 rounded-sm hover:border-[var(--ms-blue)] transition-colors"
+                  className="bg-white p-4 sm:p-6 shadow-sm border border-gray-200 rounded-sm hover:border-[var(--ms-blue)] transition-colors"
                 >
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div className="flex-1">
@@ -261,7 +261,7 @@ export default function CVEDetailPage({ params }: { params: Promise<{ id: string
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-6 px-4 mt-auto border-t border-gray-200">
+      <footer className="bg-gray-100 py-4 sm:py-6 px-4 mt-auto border-t border-gray-200">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <div className="flex flex-wrap justify-center gap-6">
             <a href="https://go.microsoft.com/fwlink/?LinkId=521839" className="hover:underline" target="_blank" rel="noopener noreferrer">Privacy</a>

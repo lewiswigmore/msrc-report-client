@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateTokenClaims } from '@/lib/verifyToken';
 
-const MSRC_ENDPOINT = 'https://api.msrc.microsoft.com/report/v2.0/abuse';
+const MSRC_ENDPOINT = 'https://api.msrc.microsoft.com/report/v3.0/Abuse/report';
 
 // Valid incident and threat types for validation
 const VALID_INCIDENT_TYPES = [
@@ -11,9 +11,35 @@ const VALID_INCIDENT_TYPES = [
   'Malware',
   'Phishing',
   'Spam',
+  'Azure Account Compromise',
+  'Malicious Artifact',
+  'Malicious Text or URL',
+  'Responsible AI',
+  'Impersonation Email Name',
+  'Impersonation Domain Url',
+  'Impersonation Typo Squatting',
+  'M365 Account Compromise',
+  'W365 Account Compromise',
+  'Arbitrage Abuse',
+  'Account Takeover',
+  'Disposable MSA/Entitlement Stacking',
+  'Perks Harvesting',
+  'Refund Abuse',
+  'CSV (Currency Stored Value) Abuse',
+  'Developer Fraud',
+  'Other Gaming',
 ] as const;
 
-const VALID_THREAT_TYPES = ['IP Address', 'URL', 'Azure Subscription'] as const;
+const VALID_THREAT_TYPES = [
+  'IP Address',
+  'URL',
+  'Community Gallery',
+  'Azure Subscription',
+  'Impersonation',
+  'M365 Investigation',
+  'W365 Investigation',
+  'Gaming',
+] as const;
 
 // Basic input validation
 function validateReportBody(body: unknown): { valid: boolean; error?: string } {
@@ -33,7 +59,7 @@ function validateReportBody(body: unknown): { valid: boolean; error?: string } {
   }
 
   const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  if (!report.reporterEmail || typeof report.reporterEmail !== 'string' || !emailRegex.test(report.reporterEmail) || report.reporterEmail.length > 254) {
+  if (!report.reporterEmail || typeof report.reporterEmail !== 'string' || !emailRegex.test(report.reporterEmail) || report.reporterEmail.length > 64) {
     return { valid: false, error: 'Invalid or missing reporterEmail' };
   }
 
@@ -43,6 +69,11 @@ function validateReportBody(body: unknown): { valid: boolean; error?: string } {
 
   if (!report.reportNotes || typeof report.reportNotes !== 'string' || report.reportNotes.length > 10000) {
     return { valid: false, error: 'Invalid or missing reportNotes' };
+  }
+
+  // Validate timeZone (required in v3.0)
+  if (!report.timeZone || typeof report.timeZone !== 'string' || report.timeZone.length < 1) {
+    return { valid: false, error: 'Invalid or missing timeZone' };
   }
 
   // Validate date format (YYYY-MM-DD)
@@ -72,6 +103,9 @@ function validateOrigin(request: NextRequest): boolean {
   return origin === requestOrigin;
 }
 
+// Demo mode: auth not configured, return mock success
+const isDemoMode = !process.env.NEXT_PUBLIC_AZURE_CLIENT_ID || !process.env.NEXT_PUBLIC_AZURE_TENANT_ID;
+
 export async function POST(req: NextRequest) {
   try {
     // CSRF: reject cross-origin requests
@@ -79,6 +113,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Forbidden', message: 'Cross-origin requests not allowed' },
         { status: 403 }
+      );
+    }
+
+    // In demo mode, validate body but return mock success without forwarding
+    if (isDemoMode) {
+      let body: unknown;
+      try {
+        body = await req.json();
+      } catch {
+        return NextResponse.json(
+          { error: 'Bad Request', message: 'Invalid JSON in request body' },
+          { status: 400 }
+        );
+      }
+      const validation = validateReportBody(body);
+      if (!validation.valid) {
+        return NextResponse.json(
+          { error: 'Bad Request', message: validation.error },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json(
+        { message: 'Demo mode: report accepted (not submitted to MSRC)', demo: true },
+        { status: 200 }
       );
     }
 
