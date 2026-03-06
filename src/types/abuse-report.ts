@@ -4,12 +4,36 @@ export type IncidentType =
   | 'Illegal/Violates the rights of others'
   | 'Malware'
   | 'Phishing'
-  | 'Spam';
+  | 'Spam'
+  | 'Azure Account Compromise'
+  | 'Malicious Artifact'
+  | 'Malicious Text or URL'
+  | 'Responsible AI'
+  | 'Impersonation Email Name'
+  | 'Impersonation Domain Url'
+  | 'Impersonation Typo Squatting'
+  | 'M365 Account Compromise'
+  | 'W365 Account Compromise'
+  | 'Arbitrage Abuse'
+  | 'Account Takeover'
+  | 'Disposable MSA/Entitlement Stacking'
+  | 'Perks Harvesting'
+  | 'Refund Abuse'
+  | 'CSV (Currency Stored Value) Abuse'
+  | 'Developer Fraud'
+  | 'Other Gaming';
 
 export type ThreatType =
   | 'IP Address'
   | 'URL'
-  | 'Azure Subscription';
+  | 'Community Gallery'
+  | 'Azure Subscription'
+  | 'Impersonation'
+  | 'M365 Investigation'
+  | 'W365 Investigation'
+  | 'Gaming';
+
+export type ArtifactType = 'VmImage' | 'VmApplication';
 
 export interface AbuseReport {
   date: string; // YYYY-MM-DD
@@ -43,4 +67,22 @@ export interface AbuseReport {
   reportedTenantId?: string; // uuid
   reportedSubscriptionId?: string; // uuid
   testSubmission?: boolean;
+  phoneNumber?: string;
+  reporterNotes?: string;
+  reporterOrg?: string;
+  attachmentId?: string;
+  attachmentFileName?: string;
+  icmNumber?: string;
+  subscriptionId?: string; // uuid
+  publicGalleryName?: string;
+  artifactType?: ArtifactType;
+  artifactName?: string;
+  artifactVersion?: string;
+  impersonationEmailName?: string;
+  impersonationDomainUrl?: string;
+  impersonationTypoSquatting?: string;
+  msa?: string;
+  region?: string;
+  developer?: string;
+  gameTitle?: string;
 }
